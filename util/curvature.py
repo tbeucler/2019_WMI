@@ -20,6 +20,7 @@ def get_contours(bFMSE, minLength = 35):
 
 def calc_curv(x, y, dx = 3300):
 #TODO: Use running mean or Bsplines
+#TODO: Compute curvature at random places, makes sampling more independent
 
     # determine equally spaced points along the contour
     xd = np.diff(x)
