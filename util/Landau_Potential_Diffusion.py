@@ -5,7 +5,6 @@ import xarray as xr
 import numpy as np
 import numpy.fft as fft
 import datetime
-from ccam import *
 from skimage import measure
 from scipy import ndimage
 import scipy.integrate as sin 
