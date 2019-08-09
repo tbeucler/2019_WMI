@@ -5,7 +5,6 @@ import xarray as xr
 import numpy as np
 import numpy.fft as fft
 import datetime
-from ccam import *
 from skimage import measure
 from scipy import ndimage
 import scipy.integrate as sin 
@@ -50,7 +49,7 @@ def potential(order_parameter,forcing,Nbins=30):
                                                     order_parameter,\
                                                     forcing)
     Vm = -sin.cumtrapz(forcing_m,x=bin_mid,axis=0)
-    return bin_mid,np.concatenate((np.zeros((1,1)),Vm),axis=0),forcing_m,forcing_std
+    return bin_mid,np.concatenate((np.zeros((1,1)),Vm),axis=0)[:,0],forcing_m,forcing_std
 
 ## 2) Diffusion
 
@@ -79,8 +78,9 @@ def wavenumbers(x,y):
             
     return k,l,kmod,2*np.pi*np.sqrt(2)/kmod,kext,lext,kmod_ext
 
-def dif_from_smoothing(x,y,field,field_adv):
+def dif_from_smoothing(x,y,field,field_adv,time_av=0):
     # Takes: Coordinates(x,y),order parameter,advection field
+    # Takes: time_av = [0] t-averaged diffusivity or [1] diffusivity(t)?
     # Returns: Effective diffusion(m2/s),diffusion field
     
     # Define wavenumbers
@@ -92,24 +92,71 @@ def dif_from_smoothing(x,y,field,field_adv):
     FFT_adv = fft.fft2(field_adv)
     FFT = fft.fft2(field)
     
-    # Calculate diffusivity(t) from variance injection from advection
-    # Fits diffusivity so that it smoothes total variance at the same rate
-    S = field.shape
-    D = np.zeros((S[0],))
-    for it in range(S[0]):
-        num = np.real(np.conj(FFT_adv[it,:,:])*FFT[it,:,:])[dok,:][:,dol].flatten()
+    if time_av==0:
+        # Calculate diffusivity(t) from variance injection from advection
+        # Fits diffusivity so that it smoothes total variance at the same rate
+        S = field.shape
+        D = np.zeros((S[0],))
+        for it in range(S[0]):
+            num = np.real(np.conj(FFT_adv[it,:,:])*FFT[it,:,:])[dok,:][:,dol].flatten()
+            NUM = sin.trapz(x=KM[num<0],y=num[num<0])
+            den = (KM**2)*np.real(np.conj(FFT[it,:,:])*FFT[it,:,:])[dok,:][:,dol].flatten()
+            DEN = sin.trapz(x=KM,y=den)
+            D[it] = -NUM/DEN
+
+        # Transforms diffusion back into physical space
+        field_dif = -np.real(fft.ifft2(np.moveaxis(np.tile(D,(S[1],S[2],1)),2,0)*\
+                                       np.tile((kmod_ext**2),(S[0],1,1))*FFT))
+    elif time_av==1:
+        # Calculates diffusivity based on <num> and <den>
+        num = np.mean(np.real((np.conj(FFT_adv)*FFT)[:,dok,:][:,:,dol]),axis=0).flatten()
         NUM = sin.trapz(x=KM[num<0],y=num[num<0])
-        den = (KM**2)*np.real(np.conj(FFT[it,:,:])*FFT[it,:,:])[dok,:][:,dol].flatten()
+        den = (KM**2)*np.mean(np.real((np.conj(FFT)*FFT)[:,dok,:][:,:,dol]),axis=0).flatten()
         DEN = sin.trapz(x=KM,y=den)
-        D[it] = -NUM/DEN
-    
-    # Transforms diffusion back into physical space
-    field_dif = -np.real(fft.ifft2(np.moveaxis(np.tile(D,(S[1],S[2],1)),2,0)*\
-                                   np.tile((kmod_ext**2),(S[0],1,1))*FFT))
-    
-    # Activate test if you would like to calculate the advection
-    # residual in spectral space rather than in physical space
-#     field_adv_test = np.real(fft.ifft2(FFT_adv+np.moveaxis(np.tile(D,(S[1],S[2],1)),2,0)*\
-#                                    np.tile((kmod_ext**2),(S[0],1,1))*FFT))
+        D = -NUM/DEN
+        
+        # Transforms time-averaged diffusion back into physical space
+        field_dif = -np.real(fft.ifft2(D*(kmod_ext**2)*FFT))
     
     return D,field_dif
+
+## 3) Landau function
+
+def nearest_index(array, value):
+    idx = (np.abs(array-value)).argmin()
+    return idx
+
+def Landau_energy(order_p,order_p_tendency=None,order_p_reference=None,V_fixed=None,bin_fixed=None,N_bins=30):
+    # Assumes time axis is axis0
+    # Takes: Order parameter, its time-tendency,
+    # a reference 0 value for the total potential and
+    # Nb of bins for the conditional mean
+    # If a fixed potential is given V_fixed(bin_fixed), no need to calculate V
+    # Returns: Landau_energy(t) assuming fixed potential
+    # binmid to plot the total potential V
+    
+    if V_fixed is None: # Then calculate potential based on total tendency
+        
+        if order_p_tendency is None:
+            print('Please input the temporal tendency of the order parameter.')
+            return 0,0,0
+        else: binmid,V,tmp,tmp = potential(order_p,order_p_tendency,N_bins)
+            
+    else: # Use the potential V_fixed(bin_fixed) provided as input
+        
+        if bin_fixed is None:
+            print('Please input the bins used to calculate your potential.')
+            return 0,0,0
+        else: V = V_fixed; binmid = bin_fixed
+    
+    # Change the potential so that potential(order_p_reference)=0
+    if order_p_reference:
+        idx = nearest_index(binmid,order_p_reference)
+        V = V-V[idx]
+    
+    # Calculate the Landau energy in time by interpolating
+    # the order parameter field onto the potential
+    V_field = np.interp(order_p,binmid,V)
+    F = np.mean(V_field,axis=(1,2))
+    
+    return F,binmid,V
