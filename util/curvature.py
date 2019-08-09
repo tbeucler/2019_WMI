@@ -3,7 +3,7 @@ import numpy as np
 from skimage.measure import find_contours
 from scipy.signal import savgol_filter
 
-def get_contours(bFMSE, minLength = 35):
+def get_contours(bFMSE, minLength = 0):
     #INPUT: binary field
     
     contours = (find_contours(bFMSE[:,:], 0))
@@ -20,6 +20,7 @@ def get_contours(bFMSE, minLength = 35):
 
 def calc_curv(x, y, dx = 3300):
 #TODO: Use running mean or Bsplines
+#TODO: Compute curvature at random places, makes sampling more independent
 
     # determine equally spaced points along the contour
     xd = np.diff(x)
@@ -79,7 +80,7 @@ def distance_contour_extremas(FMSE, FMSE_told, dx = 1):
         x = contour[:, 1]
         y = contour[:, 0]
                 
-        cx, cy, curv = calc_curv(x, y)
+        cx, cy, curv = calc_curv(x, y, dx=dx)
 
         extrema, ex, ey = get_extrema(curv, cx, cy)
 
@@ -95,7 +96,7 @@ def distance_contour_extremas(FMSE, FMSE_told, dx = 1):
     extremas = np.array([], int)
     
     for n, contour in enumerate(contours):
-        cx, cy, curv = calc_curv(contour[:, 1], contour[:, 0])
+        cx, cy, curv = calc_curv(contour[:, 1], contour[:, 0], dx = dx)
         extrema, ex, ey = get_extrema(curv, cx, cy)
         
         x = np.append(x, ex)
@@ -113,10 +114,9 @@ def distance_contour_extremas(FMSE, FMSE_told, dx = 1):
     for n in range(len(x)):
         distance = np.sqrt((x_old-x[n])**2 + (y_old-y[n])**2) #Distance between all the points
 
-        #>
         #Only consider extrema that are closer together than 1/R of curvature
         #if np.min(distance) < 100*np.abs(extremas[n]):
-        if np.min(distance) < 10:
+        if np.all(np.min(distance) < 10, 0. < extremas[n]) :
             
             #All the point at t, that fulfill the criterion
             x_new = np.append(x_new, x[n])
