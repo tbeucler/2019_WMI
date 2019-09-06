@@ -1,6 +1,6 @@
 
 import numpy as np
-from skimage.measure import find_contours
+from skimage.measure import find_contours, label, regionprops
 from scipy.signal import savgol_filter
 
 def get_contours(bFMSE, minLength = 0):
@@ -30,7 +30,7 @@ def calc_curv(x, y, dx = 3300):
     u = np.hstack([[0],u])
 
     
-    t = np.arange(0,u.max(), 7) # use effective resolution (7 grid spacings)
+    t = np.arange(0,u.max(), 1) # use effective resolution (7 grid spacings)
     xn = np.interp(t, u, x)
     yn = np.interp(t, u, y)
     
@@ -130,3 +130,67 @@ def distance_contour_extremas(FMSE, FMSE_told, dx = 1):
     
     #Return the values of the extrema their coordinates and the distance between them
     return  extremas_new, x_new, y_new, x_corr, y_corr, distances * dx
+
+def eccentricity(fld, lobj = 1, nb = 3 ):
+    #lobj: track the lobj largest objects
+    #nb:   number of boundary lines of periodic domain
+    
+    nt,xn,yn = np.shape(fld)
+
+    #Domain of the analysis region in the tiled field
+    xl  = np.floor_divide(xn, 2)
+    yl  = np.floor_divide(yn, 2)
+    xr  = np.floor(3/2 * xn)
+    yr  = np.floor(3/2 * yn)
+    
+    #Allocate arrays
+    alpha = np.empty(nt)
+    perimeter = np.empty(nt)
+    a = np.empty(nt)
+    b = np.empty(nt)
+    
+    for t in range(nt):
+     
+        #To take care of the periodic domain the domain is copied four times.
+        tiled_fld = np.tile(fld[t,nb:-nb,nb:-nb],(2,2))
+
+        labels = label(tiled_fld, neighbors=8)
+        props = regionprops(labels)
+     
+        alpha_p = np.empty(lobj)
+        perimeter_p = np.empty(lobj)
+        a_p = np.empty(lobj)
+        b_p = np.empty(lobj)
+
+        #Find the lobj biggest objects
+        area = np.array([])
+        ind = np.array([], dtype=int)
+        for p in range(len(props)):
+        
+            y0, x0 = props[p].centroid - xl
+        
+            #Skip allobjects who's centroid is not in the untiled domain
+            if  x0 < xl or x0 > xr :
+                continue
+        
+            if  y0 < yl+ nb or y0 > yr:
+                continue
+
+            area = np.append(area, props[p].area)
+            ind = np.append(ind, p)
+            
+        i=0
+        for p in ind[np.argpartition(area, -lobj)[-lobj:]]:
+               
+            alpha_p[i] =  props[p].minor_axis_length / props[p].major_axis_length
+            perimeter_p[i] = props[p].perimeter
+            a_p[i] = props[p].major_axis_length
+            b_p[i] =props[p].minor_axis_length
+            i+=1
+
+        alpha[t] = np.percentile(alpha_p, 50, interpolation='linear')
+        perimeter[t] = np.sum(perimeter_p)
+        a[t] = np.sum(a_p)
+        b[t] = np.sum(b_p)
+
+    return alpha, perimeter, a, b
