@@ -43,7 +43,8 @@ def conditional_avg_and_std(bin_edges,field_x,field_y):
 def potential(order_parameter,forcing,Nbins=30):
     # Takes: Order parameter, Forcing in time, Number of bins
     # Returns: bin_mid [middle of bins], Potential, conditional mean (forcing), conditional std (forcing)
-    order_hist,bin_edges = np.histogram(order_parameter.values.flatten(),bins=Nbins)
+    if type(order_parameter) is np.ndarray: order_hist,bin_edges = np.histogram(order_parameter.flatten(),bins=Nbins)
+    else: order_hist,bin_edges = np.histogram(order_parameter.values.flatten(),bins=Nbins)
     bin_mid = 0.5*(bin_edges[:-1]+bin_edges[1:])
     forcing_m,forcing_std = conditional_avg_and_std(bin_edges,\
                                                     order_parameter,\
@@ -51,7 +52,7 @@ def potential(order_parameter,forcing,Nbins=30):
     Vm = -sin.cumtrapz(forcing_m,x=bin_mid,axis=0)
     return bin_mid,np.concatenate((np.zeros((1,1)),Vm),axis=0)[:,0],forcing_m,forcing_std
 
-## 2) Diffusion
+## 2) Diffusion from fitting all negative variance rates
 
 def wavenumbers(x,y):
     # Takes x,y
@@ -86,6 +87,7 @@ def dif_from_smoothing(x,y,field,field_adv,time_av=0):
     # Define wavenumbers
     k,l,kmod,lam,kext,lext,kmodext = wavenumbers(x,y)
     KM = kmod.flatten()
+    Nk = np.size(k); Nl = np.size(l);
     dok = np.arange(1,Nk-1); dol = np.arange(1,Nl-1); # Index restriction for 2D FFT
     
     # Fourier transform the fields
