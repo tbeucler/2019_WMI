@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "#!/bin/sh"
+echo "#SBATCH -n $1"
+echo "#SBATCH -p $2"
+echo "#SBATCH --output=$3"
+echo "#SBATCH --error=$4"
+echo "#SBATCH --mem=$5"
+echo "#SBATCH --mail-type=ALL"
+echo "#SBATCH --mail-user=$6"
+echo "python $7"
