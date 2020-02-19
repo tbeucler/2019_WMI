@@ -1,0 +1,54 @@
+  
+    Mean values of the timings for all tasks:
+    =========================================
+  
+Timings for     3 x     3:  
+  
+Time for the setup of the model:         0.78
+Time for the cleanup of the model:       0.48
+Time for the total model run:        45742.22
+  
+                             Min.         Avg.         Max.        Total
+  
+Dyn. Computations            185.56       248.95       287.17      2240.51
+  Horizontal Diffusion         0.00         0.00         0.00         0.00
+  Horizontal Advection         0.00         0.00         0.00         0.00
+  Add. Tend+Moist              0.00         0.00         0.00         0.00
+  Slow Tendencies              0.00         0.00         0.00         0.00
+  Fast Waves                   0.00         0.00         0.00         0.00
+  Relaxation                   0.79         0.81         0.84         7.32
+  Spectr. Nudging              0.00         0.00         0.00         0.00
+Fast Waves Comm.               0.00         0.00         0.00         0.00
+Fast Waves Barrier             0.00         0.00         0.00         0.00
+Communications  Dyn          253.86       258.39       260.72      2325.54
+Barrier Waiting Dyn            0.00         0.00         0.00         0.00
+Global Comm     Dyn            0.00         0.00         0.00         0.00
+Barrier GlobCom Dyn            0.00         0.00         0.00         0.00
+  
+wrapper copy in              652.78       674.12       704.10      6067.06
+wrapper dycore step        28685.65     28738.65     28805.50    258647.81
+wrapper copy out             232.92       273.88       297.00      2464.94
+wrapper copy swap              3.28         3.42         4.20        30.79
+Phy. Computations           5271.78      5531.54      6036.17     49783.87
+  Precipitation             1188.33      1289.45      1465.68     11605.07
+  Radiation                 2943.85      3042.74      3217.43     27384.70
+  Turbulence                 992.55      1076.48      1232.27      9688.34
+  Convection                   0.00         0.00         0.00         0.00
+  Soil Model                   0.00         0.00         0.00         0.00
+  Sub-grid Scale Oro.          0.00         0.00         0.00         0.00
+Communications  Phy         4752.17      5245.94      5531.79     47213.46
+Barrier Waiting Phy            0.00         0.00         0.00         0.00
+  
+Add. Computations           2977.64      2993.79      3006.84     26944.13
+Input                          0.51         0.58         0.98         5.22
+  read data                    0.00         0.00         0.00         0.00
+  meta data                    0.00         0.00         0.00         0.00
+  computations I               0.00         0.00         0.00         0.00
+  distribute data              0.00         0.00         0.00         0.00
+Output                      1739.75      1752.86      1800.75     15775.73
+  computations O             526.24       530.66       534.61      4775.92
+  meta  data                   0.01         0.02         0.04         0.16
+  write data                  87.05       570.20      1001.61      5131.77
+  gather data                215.21       632.96      1106.36      5696.62
+  
+  

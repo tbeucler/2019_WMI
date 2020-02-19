@@ -1,0 +1,7 @@
+&DIACTL
+ n0meanval=0,
+ nincmeanval=1,
+ ltestsuite=.false., ! has to be off for large simulations!
+ n0gp=0,  ! make sure this is 0 for large simulations!
+/
+

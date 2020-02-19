@@ -1,0 +1,44 @@
+&PHYCTL
+  lgsp = .true.,
+    itype_gscp = 4,      ! Kessler-type schemes (1-3), graupel scheme (4)
+    ldiniprec = .false.,    ! diagnostic initialization of rain and snow
+  lrad = .true.,
+    hincrad = 0.25,
+    lradtopo = .false.,
+    icldm_rad = 4,      ! cloud respresentation in radiation (0=no clouds; 1=only
+                        ! GS; 2=GS+SGS water cl; 3/4=GS+SGS incl ice clouds)
+    radlat = 0.0,
+    radlon = 0.0,
+  ltur = .true.,
+    ninctura = 1,
+    itype_turb = 3,
+    l3dturb = .false.,
+    imode_turb = 1,     ! implicit vertical diffusion with flux lower bc
+    icldm_turb = 2,     ! cloud representation in turbulenc -1:dry, 1:grid, 2:grid+sg
+    itype_wcld = 2,     ! type of cloud water diagnosis (1=RH, 2=statistical)
+    lexpcor = .false.,
+    ltmpcor = .false.,
+    lcpfluc = .false.,
+    lnonloc = .false.,  ! non-local calculation of vertical gradients
+    lsso = .false.,
+  itype_tran = 2,       ! surface layer scheme (1=Louis, 2=TKE-based scheme)
+    imode_tran = 1,     ! scheme type (1=diagnostic TKE, 2=prognostic TKE)
+    icldm_tran = 0,     ! cloud representation in new SL scheme (itype_tran=2)
+    itype_synd = 1,     ! diagnosis of synoptic station values (1=MOST,2=new)
+    lprfcor = .false.,  ! not tested, set to .false.
+  lsoil = .false.,
+    lmulti_layer = .true.,
+    llake = .false.,
+    lmelt = .false.,
+    ke_soil=9,
+    czml_soil=0.005, 0.025, 0.07, 0.16, 0.34, 0.70, 1.47, 2.86, 5.74, 11.50,
+    czbot_w_so=4.0,
+    itype_evsl = 2,
+    itype_trvg = 2,
+  lseaice = .false.,
+  lconv = .false.,
+    itype_conv = 3,
+    lcape = .false.,
+    lconf_avg = .true.,
+/
+

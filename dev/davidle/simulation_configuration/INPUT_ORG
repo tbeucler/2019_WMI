@@ -1,0 +1,60 @@
+ &LMGRID
+  startlat_tot = 0.,
+  startlon_tot = 0.,
+  pollat = 90.,
+  pollon = -180.,
+  dlon = 0.03,
+  dlat = 0.03,
+  ie_tot = 506,
+  je_tot = 506,
+  ke_tot = 74,
+ /END
+ &RUNCTL
+  dt = 30.,
+  hstart = 0, hstop = 2400.,
+  ydate_ini = '2011071212',
+  ydate_end = '2011071212',
+  nprocx = 3, nprocy = 3,
+  nprocio = 0,                  ! this has to be 0 for large simulation domains (global fields)
+  num_asynio_comm=0,
+  num_iope_percomm=0,
+  nboundlines = 3, 
+  itype_calendar = 0,
+  hincmxt = 24, hincmxu = 24,
+  ncomm_type = 1,
+  ldump_ascii=.FALSE.,
+  lartif_data = .true.,
+  l2dim = .false.,
+  lperi_x = .true.,
+  lperi_y = .true.,
+  lphys = .true.,
+  idbg_level=1,      ! this has to be <=4 for large simulation domains (global fields)
+  lreproduce=.false., ! this has to be off for large simulation domains (global fields)
+  ldiagnos=.false.,  ! this has to be off for large simulation domains (global fields)
+  l_t_check = .false.,
+ /END
+ &ARTIFCTL
+  irefatm = 2,
+ /END
+ &TUNING
+  securi = 0.5,
+  tkhmin = 0.4,
+  tkmmin = 0.4,
+  mu_rain = 0.0,
+  v0snow = 20.0,
+  entr_sc = 0.000186,
+  soilhyd=1.62,
+  fac_rootdp2 = 1.0,
+  uc1 = 0.0626,
+  radfac = 0.5,
+  tur_len = 150.,        ! maximum turbulent length scale (m) !DL_HACK
+  qc0 = 0.0002,          ! cloud water threshold for autoconversion
+  qi0 = 0.0,             ! cloud ice threshold for autoconversion
+  clc_diag = 0.5,        ! cloud cover at saturation in stat. cloud diagnostic
+  q_crit = 1.6,          ! critical value for normalized over-saturation
+  securi = 0.5,          ! security factor for max diffusion coefficients
+  wichfakt = 0.0,        ! vertical smoothing factor for explicit diff. coeffs
+  rain_n0_factor=1.,
+  cloud_num=1.0e+08,
+ /END
+

@@ -1,0 +1,57 @@
+ &IOCTL
+  yform_read = 'ncdf',
+  nhour_restart = 10000,10000,10000,
+  ydir_restart_out = './restart',
+  ydir_restart_in = './restart',
+  ytunit_restart = 'd',
+  ngribout = 2, ! has to be off for large simulations
+  yncglob_institution="Max Planck Institute for Meteorology, Hamburg, Germany",
+  yncglob_title = "RCE",
+  yncglob_source = "cosmo",
+  yncglob_project_id = "RCE",
+  yncglob_experiment_id ="large domain, 300K",
+  ncglob_realization = 1,
+  yncglob_contact = "David Leutwyler (david.leutwyler@mpimet.mpg.de)"
+  yncglob_references = "http://www.clm-community.eu/",
+  lbdclim = .true.,
+  lasync_io=.false., ! has to be off for large simulations
+  lprefetch_io=.false., ! has to be off for large simulations
+ /END
+ &DATABASE
+ /END
+ &GRIBIN
+ /END
+ &GRIBOUT
+  hcomb = 0., 2400, 6,
+  yvarml ='U', 'V', 'W', 'T', 'P', 'RHO',
+        'QV', 'QC', 'QI', 'QR', 'QS', 'QG',
+        'CLC_SGS', 'RELHUM',
+  yvarpl = ' ',
+  yvarzl = ' ',
+  luvmasspoint = .FALSE.,
+  lcheck = .FALSE.,
+  lwrite_const = .TRUE.,
+  ydir = './output_3D',
+  ytunit = 'f',
+  yform_write = 'ncdf',
+ /END
+ &GRIBOUT
+  hcomb = 0., 2400, 1,
+  yvarml = 'TOT_PREC', 'TOT_PR', 'T_2M', 'TD_2M', 'PS',
+        'CEILING','CLDEPTH',
+        'SHFL_S','LHFL_S',
+        'ASHFL_S','ALHFL_S','ASOB_S','ASOB_T','ATHB_T',
+        'ASWDIFU_S','ATHB_S','ASWD_S'
+        'CLCL','CLCM','CLCH','CLCT',
+        'TWATER', 'TWATFLXU', 'TWATFLXV',
+        'TQV', 'TQC', 'TQI', 'TQR', 'TQS', 'TQG',
+        'FMSE', 'RELHUM_2M', 'QV_S',
+  yvarpl = ' ',
+  yvarzl = ' ',
+  luvmasspoint = .FALSE.,
+  lcheck = .FALSE.,
+  lwrite_const = .TRUE.,
+  ydir = './output',
+  ytunit = 'f',
+  yform_write = 'ncdf',
+ /END
