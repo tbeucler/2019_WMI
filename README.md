@@ -5,7 +5,7 @@ Co First-Authors = Tom Beucler, David Leutwyler, Julia Windmiller
 
 arXiv link = [https://arxiv.org/abs/2002.11301]
 
-Before running scripts in this repository, consider setting up a new conda environment reserved for this repository:  
+Before running scripts in this repository, consider setting up a new conda environment specific to this repository:  
 `conda env create -f 2019_WMI/environment.yml`  
 `conda activate BLW`  
 See [https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html] for more conda environment commands.
